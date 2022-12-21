@@ -2,10 +2,7 @@ package ru.deliveryClub;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.openqa.selenium.By;
-import org.openqa.selenium.ElementClickInterceptedException;
-import org.openqa.selenium.Keys;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import static org.junit.Assert.assertEquals;
@@ -22,14 +19,15 @@ public class FirstTest extends WebDriverSettings {
         String title = "Быстрая доставка еды Delivery Club";
         assertEquals(title, driver.getTitle());
 
-        //Кликаем по кнопке с добавлением адреса доставки
+        //Кликаем 'Добавить новый адрес'
         click(By.className("DesktopAddressButton_address"));
 
-        //Если геолокация подставила автоматическим адрес, то убираем его нажатием крестика
-        if(driver.findElement(By.xpath("//div[@data-testid='address-button-add']")).isDisplayed()) {
+        //Если геолокация подставила автоматическим адрес, то кликаем крестик
+        try {
             driver.findElement(By.xpath("//div[@data-testid='address-button-add']")).click();
-            click(By.cssSelector("svg.UiKitUiKitIcon_m.UiKitUiKitIcon_root.AppAddressInput_closeIcon"));
-        }
+        } catch (Exception ignored) {}
+
+        click(By.cssSelector("svg.UiKitUiKitIcon_m.UiKitUiKitIcon_root.AppAddressInput_closeIcon"));
 
         //Вводим адрес для доставки
         inputText("Брянск, Советская улица, 110, подъезд 2", By.xpath("//input[@data-testid='address-input']"));
@@ -52,45 +50,72 @@ public class FirstTest extends WebDriverSettings {
         click(By.xpath("//div[text()='Гриль-чиз Перечный жюльен']"));
 
         //Проверяем описание выбранной позиции
-        checkText("Картофель, сыр творожный, жюльен перечный с курицей и грибами, сыр моцарелла"
-                //, By.xpath("//div[@class='Modal_modalWrapper']/div/div[2]/div"));
-        , By.cssSelector("div.HTMLDescription_root.ModalMenuItemOptions_htmlDescription"));
+        try{
+            Assert.assertEquals("Картофель, сыр творожный, жюльен перечный с курицей и грибами, сыр моцарелла"
+                    , driver.findElement(By.cssSelector("div.HTMLDescription_root.ModalMenuItemOptions_htmlDescription")).getText());
+        } catch (Exception ignored) {
+
+
+            //В случае отказа по времени доставки переходим к тесту по московскому адресу
+            SecondTest.testMoskovDelivery();
+            return;
+        }
 
         //Дублируем заказ
         click(By.xpath("//div[@data-testid='ui-counter-plus-button']"));
 
         //Проверяем стоимость
-        checkText("630 ₽", By.xpath("/html/body/div[4]/div/div/div/div[3]/div/div[2]/div[2]/span"));
+        checkText("630 ₽", By.cssSelector("div.ModalMenuItemOptions_totalValue > span"));
 
         //Добавляем заказ в корзину
         click(By.xpath("//button[@data-testid='desktop-menu-item-options-confirm']"));
 
+        //Выбираем пункт меню
+        click(By.xpath("//li[text()='Супы']"));
+
+        //Выбираем позицию
+        click(By.xpath("//div[text()='Борщ']"));
+
+        //Проверяем описание позиции
+        checkText("Картофель, свекла, морковь, капуста, томатная паста, томаты в собственном соку, лук жареный, петрушка, соль, масло растительное, сахар, уксус, бульон куриный, куриное филе, говядина."
+                + "\nНа 100 граммов: К 34, Б 2, Ж 1, У 5"
+        ,By.cssSelector("div.HTMLDescription_root.ModalMenuItemOptions_htmlDescription"));
+
+        //Добавляем ингридиент
+        click(By.xpath("//span[text()='Майонез']"));
+
+        //Дублируем заказ
+        click(By.xpath("//div[@data-testid='ui-counter-plus-button']"));
+
+        //Проверяем стоимость
+        checkText("330 ₽", By.cssSelector("div.ModalMenuItemOptions_totalValue > span"));
+
+        //Добавляем заказ в корзину
+        click(By.xpath("//button[@data-testid='desktop-menu-item-options-confirm']"));
+
+        //Открываем корзину
+        click(By.cssSelector("span.DesktopHeader_cartButtonText"));
+
+        //Проверяем описание позиций
+        checkText("Гриль-чиз Перечный жюльен", By.cssSelector("div.NewCartContent_root > div:nth-child(2) > div.UiKitProductCardRow_info > div"));
+        checkText("Борщ", By.cssSelector("div.NewCartContent_root > div:nth-child(3) > div.UiKitProductCardRow_info > div"));
+
+        //Кликаем 'Далее'
+        click(By.xpath("//div[text()='Верно, далее']"));
+
+        //Ждем подтверждения загрузки страницы с новым title
+        title = "Авторизация";
+        wait.until(ExpectedConditions.titleIs(title));
+
+        //Кликаем 'Далее'
+        click(By.id("passp:phone:controls:next"));
+
+        //Проверяем описание ошибки
+        checkText("Недопустимый формат номера", By.id("field:input-phone:hint"));
+
     }
 
-    //Дождаться элемента и кликнуть по нему
-    public void click(By path) {
-        try {
-            wait.until(ExpectedConditions.elementToBeClickable(path));
-            driver.findElement(path).click();
-            //Если клик по элементу вызывает ошибку, кликаем по его родителю
-        } catch (ElementClickInterceptedException exception) {
-            driver.findElement(path).findElement(By.xpath(".//..")).click();
-        }
-    }
 
-    //Дождаться элемента и проверить его текст
-    public void checkText(String text, By path) {
-        wait.until(ExpectedConditions.visibilityOfElementLocated(path));
-        Assert.assertEquals(text, driver.findElement(path).getText());
-    }
-
-    //Дождаться поисковую строку и ввести текст
-    public void inputText(String text, By path) {
-        wait.until(ExpectedConditions.visibilityOfElementLocated(path));
-        WebElement element = driver.findElement(path);
-        element.sendKeys(text);
-        element.sendKeys(Keys.ENTER);
-    }
 
 
 }
