@@ -1,5 +1,6 @@
 package ru.deliveryClub;
 
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.openqa.selenium.By;
@@ -21,7 +22,7 @@ public class WebDriverSettings {
         driver = new ChromeDriver();
         wait = new WebDriverWait(driver, Duration.ofSeconds(10));
         driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(1));
-        //System.out.println("Test start!");
+
     }
 
     //Дождаться элемента и кликнуть по нему
@@ -49,15 +50,9 @@ public class WebDriverSettings {
         element.sendKeys(Keys.ENTER);
     }
 
-
-
-/*
     @After
     public void close() {
+
         driver.quit();
-        //System.out.println("Test close!");
     }
-
-
- */
 }

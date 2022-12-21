@@ -1,13 +1,12 @@
 package ru.deliveryClub;
 
-import org.junit.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
 public class SecondTest extends WebDriverSettings {
 
-    @Test
-    public static void testMoskovDelivery() {
+
+    public void testMoskovDelivery() {
 
         //Вводим адрес для доставки
         inputText("Москва, Октябрьская улица, 105к1", By.xpath("//input[@data-testid='address-input']"));

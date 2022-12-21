@@ -57,7 +57,7 @@ public class FirstTest extends WebDriverSettings {
 
 
             //В случае отказа по времени доставки переходим к тесту по московскому адресу
-            SecondTest.testMoskovDelivery();
+            new SecondTest().testMoskovDelivery();
             return;
         }
 
@@ -114,8 +114,4 @@ public class FirstTest extends WebDriverSettings {
         checkText("Недопустимый формат номера", By.id("field:input-phone:hint"));
 
     }
-
-
-
-
 }
