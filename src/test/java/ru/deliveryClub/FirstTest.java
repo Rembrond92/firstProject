@@ -24,10 +24,14 @@ public class FirstTest extends WebDriverSettings {
 
         //Если геолокация подставила автоматическим адрес, то кликаем крестик
         try {
+            driver.findElement(By.xpath("//span[text()='Нет']")).click();
+        } catch (Exception ignored) {}
+        try {
             driver.findElement(By.xpath("//div[@data-testid='address-button-add']")).click();
         } catch (Exception ignored) {}
-
-        click(By.cssSelector("svg.UiKitUiKitIcon_m.UiKitUiKitIcon_root.AppAddressInput_closeIcon"));
+        try {
+            driver.findElement(By.cssSelector("svg.UiKitUiKitIcon_m.UiKitUiKitIcon_root.AppAddressInput_closeIcon")).click();
+        } catch (Exception ignored) {}
 
         //Вводим адрес для доставки
         inputText("Брянск, Советская улица, 110, подъезд 2", By.xpath("//input[@data-testid='address-input']"));
@@ -55,9 +59,8 @@ public class FirstTest extends WebDriverSettings {
                     , driver.findElement(By.cssSelector("div.HTMLDescription_root.ModalMenuItemOptions_htmlDescription")).getText());
         } catch (Exception ignored) {
 
-
-            //В случае отказа по времени доставки переходим к тесту по московскому адресу
-            new SecondTest().testMoskovDelivery();
+            //В случае отказа по времени доставки тест завершается
+            driver.findElement(By.xpath("//button[@data-testid='uikit-confirm-modal-cancel']")).click();
             return;
         }
 
@@ -97,11 +100,11 @@ public class FirstTest extends WebDriverSettings {
         click(By.cssSelector("span.DesktopHeader_cartButtonText"));
 
         //Проверяем описание позиций
-        checkText("Гриль-чиз Перечный жюльен", By.cssSelector("div.NewCartContent_root > div:nth-child(2) > div.UiKitProductCardRow_info > div"));
-        checkText("Борщ", By.cssSelector("div.NewCartContent_root > div:nth-child(3) > div.UiKitProductCardRow_info > div"));
+        checkText("Гриль-чиз Перечный жюльен", By.xpath("//div[@class='MobileUIShadowableScrollBox_content NewCartContent_content']/div[2]/div[2]/div[1]"));
+        checkText("Борщ", By.xpath("//div[@class='MobileUIShadowableScrollBox_content NewCartContent_content']/div[3]/div[2]/div[1]"));
 
-        //Кликаем 'Далее'
-        click(By.xpath("//div[text()='Верно, далее']"));
+    //Кликаем 'Далее'
+        click(By.xpath("//button[@class='UiKitButton_root UiKitButton_size-l UiKitButton_variant-action UiKitButton_shape-default UiKitButton_width-full UiKitButton_theme-dc NewCartPriceButton_button']"));
 
         //Ждем подтверждения загрузки страницы с новым title
         title = "Авторизация";
